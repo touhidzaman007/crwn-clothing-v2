@@ -16,7 +16,7 @@ function Navigation() {
           <Link className="nav-link" to="/contact">
             Contact
           </Link>
-          <Link className="nav-link" to="/signin">
+          <Link className="nav-link" to="/sign-in">
             Sign In
           </Link>
         </div>
