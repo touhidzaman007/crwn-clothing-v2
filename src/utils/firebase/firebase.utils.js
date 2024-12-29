@@ -1,6 +1,11 @@
+// firebase.utils.js
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -13,26 +18,29 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const firebaseApp = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+export const auth = getAuth(firebaseApp);
+
+export const firestoreDB = getFirestore();
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({
   prompt: 'select_account',
 });
 
-export const auth = getAuth();
+export const signInWithGooglePopup = async () =>
+  await signInWithPopup(auth, provider);
 
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
-
-export const firestoreDB = getFirestore();
-
-export const createUserDocumentFromAuth = async userAuth => {
+export const createUserDocumentFromAuth = async (
+  userAuth,
+  additionalInformation = {}
+) => {
   if (!userAuth) return;
 
   const userDocRef = doc(firestoreDB, 'users', userAuth.uid);
-
   const userSnapshot = await getDoc(userDocRef);
 
+  // If user doesn't exist, create one
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -42,10 +50,28 @@ export const createUserDocumentFromAuth = async userAuth => {
         displayName,
         email,
         createdAt,
+        ...additionalInformation,
       });
+      console.log('User created successfully');
     } catch (error) {
-      console.log('Error creating the user', error.message);
+      console.error('Error creating user document:', error);
     }
+  } else {
+    console.log('User document already exists');
   }
+
   return userDocRef;
 };
+
+export const createAuthUserWithEmailAndPasswordFunction = async (
+  email,
+  password
+) => {
+  if (!email || !password) return;
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signOutUser = async () => await auth.signOut();
+
+export default firebaseApp;
