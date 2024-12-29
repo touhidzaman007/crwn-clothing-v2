@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  createAuthUserWithEmailAndPasswordFunction,
+  createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
 } from '../../utils/firebase/firebase.utils';
 import FormInput from '../form-input/form-ipnut.component';
@@ -33,7 +33,7 @@ function SignUpForm() {
     }
 
     try {
-      const { user } = await createAuthUserWithEmailAndPasswordFunction(
+      const { user } = await createAuthUserWithEmailAndPassword(
         email,
         password
       );
@@ -42,12 +42,15 @@ function SignUpForm() {
 
       resetFormFields();
     } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Cannot create user, email already in use');
-      } else if (error.code === 'auth/weak-password') {
-        alert('Password is too weak, need 6 or more characters');
-      } else {
-        console.log('user creation encountered an error', error);
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          alert('Cannot create user, email already in use');
+          break;
+        case 'auth/weak-password':
+          alert('Password is too weak, need 6 or more characters');
+          break;
+        default:
+          console.log('user creation encountered an error', error);
       }
     }
   };
@@ -98,7 +101,7 @@ function SignUpForm() {
           inputOptions={{
             name: 'confirmPassword',
             type: 'password',
-            value: displayName,
+            value: confirmPassword,
             onChange: handleChange,
             required: true,
           }}
