@@ -18,6 +18,39 @@ const firebaseConfig = {
   appId: '1:235949225170:web:48bc5f0da48189c0e5a90b',
 };
 
+const configureSecurity = () => {
+  // ... other security-related logic ...
+
+  // Enable Cross-Origin Opener Policy (COOP)
+  document.documentElement.setAttribute('crossorigin', 'use-credentials');
+
+  // Enable Cross-Origin Embedder Policy (COEP)
+  document.documentElement.setAttribute('crossorigin', 'anonymous');
+
+  // Enable Cross-Origin Resource Policy (CORP)
+  document.documentElement.setAttribute('crossorigin', 'anonymous');
+
+  // Enable Content Security Policy (CSP)
+  document.documentElement.setAttribute(
+    'contentsecuritypolicy',
+    'default-src *; script-src *; style-src *; img-src *; connect-src *; font-src *;'
+  );
+
+  // Enable Referrer Policy
+  document.documentElement.setAttribute('referrerpolicy', 'no-referrer');
+
+  // Example: Check if COOP is enabled
+  if (document.documentMode) {
+    // IE11 doesn't support COOP, so you might need a fallback
+    console.warn('COOP is not supported in IE11. Consider a fallback.');
+  } else {
+    // COOP is supported, so you can assume it's enabled
+    console.log('COOP is enabled.');
+  }
+};
+
+configureSecurity();
+
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
@@ -35,7 +68,11 @@ export const signInWithGooglePopup = async () => {
     const user = result.user;
     return user;
   } catch (error) {
-    console.error('Error signing in with Google:', error);
+    if (error.code === 'auth/popup-closed-by-user') {
+      return;
+    } else {
+      console.error('Error signing in with Google:', error);
+    }
   }
 };
 

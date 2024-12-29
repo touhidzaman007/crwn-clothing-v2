@@ -24,8 +24,12 @@ function SignInForm() {
   };
 
   const signInWIthGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+    try {
+      const response = await signInWithGooglePopup();
+      await createUserDocumentFromAuth(response?.user);
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+    }
   };
 
   const handleSubmit = async e => {
