@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding: 20px 40px;
   font-family: 'Open Sans Condensed', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -12,6 +13,7 @@ code {
 
 a {
   text-decoration: none;
+  text-transform: uppercase;
   color: black;
 }
 
@@ -19,7 +21,6 @@ a {
   box-sizing: border-box;
 }
 
-a,
 p,
 span,
 h2 {
