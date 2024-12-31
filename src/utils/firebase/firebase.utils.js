@@ -9,7 +9,16 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDrcRvi_5Ru1qg2enqzjJMwlrWNphu3qlM',
@@ -78,13 +87,61 @@ export const signInWithGooglePopup = async () => {
   }
 };
 
+// Add a collection and documents to Firestore
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  // Get a reference to the collection
+  const collectionRef = collection(firestoreDB, collectionKey);
+
+  // Create a batch
+  const batch = writeBatch(firestoreDB);
+
+  // Add each object to the batch
+  objectsToAdd.forEach(object => {
+    // Get a new document reference
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    // Add the object to the batch
+    batch.set(docRef, object);
+  });
+
+  // Commit the batch
+  await batch.commit();
+  console.log('done');
+};
+
+// Get categories and documents from Firestore
+export const getCategoriesAndDocuments = async () => {
+  // Get a reference to the collection
+  const collectionRef = collection(firestoreDB, 'categories');
+  // Get the documents in the collection by querying the collection
+  const q = query(collectionRef);
+
+  // Get the query snapshot
+  const querySnapshot = await getDocs(q);
+
+  // Create a reduce of categories
+  const categoryMap = querySnapshot.docs.reduce((accumulator, doc) => {
+    // Get the data from the document
+    const { title, items } = doc.data();
+    // Add the data to the accumulator
+    accumulator[title.toLowerCase()] = items;
+    return accumulator;
+  }, {});
+
+  return categoryMap;
+};
+
 export const createUserDocumentFromAuth = async (
   userAuth,
   additionalInformation = {}
 ) => {
   if (!userAuth) return;
 
+  // Get user document reference
   const userDocRef = doc(firestoreDB, 'users', userAuth.uid);
+  // Check if user document already exists
   const userSnapshot = await getDoc(userDocRef);
 
   // If user doesn't exist, create one
