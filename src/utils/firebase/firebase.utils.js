@@ -20,7 +20,6 @@ import {
   getDocs,
 } from 'firebase/firestore';
 
-
 const firebaseConfig = {
   apiKey: 'AIzaSyDrcRvi_5Ru1qg2enqzjJMwlrWNphu3qlM',
   authDomain: 'crown-clothing-c5a19.firebaseapp.com',
