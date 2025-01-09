@@ -2,11 +2,9 @@ import { CART_ACTIONS_TYPE } from './cart.types';
 import { createReducerAction } from '../../utils/reducer/reducer.utils';
 
 const addCartItem = (cartItems, productToAdd) => {
-  // Check if the product is already in the cart
   const existingCartItem = cartItems.find(
     cartItem => cartItem.id === productToAdd.id
   );
-  // If the product is already in the cart, increase the quantity
   if (existingCartItem) {
     return cartItems.map(cartItem =>
       cartItem.id === productToAdd.id
@@ -14,16 +12,13 @@ const addCartItem = (cartItems, productToAdd) => {
         : cartItem
     );
   }
-  // If the product is not in the cart, add it with a quantity of 1
   return [...cartItems, { ...productToAdd, quantity: 1 }];
 };
 
 const removeCartItem = (cartItems, productToRemove) => {
-  // Check if the product is in the cart
   const existingCartItem = cartItems.find(
     cartItem => cartItem.id === productToRemove.id
   );
-  // If the product is in the cart, decrease the quantity
   if (existingCartItem.quantity === 1) {
     return cartItems.filter(cartItem => cartItem.id !== productToRemove.id);
   }
